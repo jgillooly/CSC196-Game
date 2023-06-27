@@ -1,8 +1,11 @@
 #include <iostream>
+#include "../../Engine/Core/Random.h"
+
+using namespace std;
 
 int main() {
-#ifdef _DEBUG
-	std::cout << "DEBUG!" << std::endl;
-#endif
-	std::cout << "Hello World!" << std::endl;
+	kiko::seedRandom((unsigned int)time(nullptr));
+	for (int i = 0; i < 10; i++) {
+		cout << kiko::random(5, 10) << endl;
+	}
 }
