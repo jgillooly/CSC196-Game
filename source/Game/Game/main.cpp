@@ -1,6 +1,7 @@
 #include <iostream>
 #include "Core/Random.h"
 #include "Core/FileIO.h"
+#include "Core/Memory.h"
 
 using namespace std;
 
@@ -13,16 +14,7 @@ void funcs() {
 	funcs();
 }
 
-void* operator new (size_t size) {
-	cout << "allocated: " << size;
-	return malloc(size);
-}
 
-void operator delete (void* address, size_t size) {
-	cout << "deallocated: " << size;
-
-	free(address);
-}
 
 
 int main() {
