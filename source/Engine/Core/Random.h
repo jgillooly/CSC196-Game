@@ -1,7 +1,7 @@
 #pragma once
 #include <random>
 
-namespace kiko {
+namespace antares {
 	void seedRandom(unsigned int seed) { srand(seed); }
 	int random() { return rand(); }
 	int random(unsigned int max) { return random() % max; }

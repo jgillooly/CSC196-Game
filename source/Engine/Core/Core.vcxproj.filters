@@ -8,5 +8,11 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Random.h" />
+    <ClInclude Include="FileIO.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="FileIO.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
