@@ -2,6 +2,7 @@
 #include "Core/Random.h"
 #include "Core/FileIO.h"
 #include "Core/Memory.h"
+#include <chrono>
 
 using namespace std;
 
@@ -10,7 +11,7 @@ void func() {
 }
 
 void funcs() {
-	int i[100000];
+	int i[1000];
 	funcs();
 }
 
@@ -23,6 +24,12 @@ int main() {
 	antares::g_memoryTracker.displayInfo();
 	delete p;
 	antares::g_memoryTracker.displayInfo();
+
+	auto start = std::chrono::high_resolution_clock::now();
+	for (int i = 0; i < 1000000; i++) {}
+	auto end = std::chrono::high_resolution_clock::now();
+	std::cout << std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count();
+
 	//for (int i = 0; i < 10; i++) {
 	//}
 
