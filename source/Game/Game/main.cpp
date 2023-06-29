@@ -3,6 +3,8 @@
 #include "Core/FileIO.h"
 #include "Core/Memory.h"
 #include <chrono>
+#include "Core/Time.h"
+#include "Renderer/Renderer.h"
 
 using namespace std;
 
@@ -25,10 +27,10 @@ int main() {
 	delete p;
 	antares::g_memoryTracker.displayInfo();
 
-	auto start = std::chrono::high_resolution_clock::now();
+	antares::Time timer;
 	for (int i = 0; i < 1000000; i++) {}
 	auto end = std::chrono::high_resolution_clock::now();
-	std::cout << std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count();
+	std::cout << timer.GetElapsedMilliseconds() << endl;
 
 	//for (int i = 0; i < 10; i++) {
 	//}
