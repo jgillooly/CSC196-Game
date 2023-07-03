@@ -4,7 +4,7 @@
 #include "Core/Memory.h"
 #include <chrono>
 #include "Core/Time.h"
-#include "Renderer/Renderer.h"
+//#include "Renderer/Renderer.h"
 
 using namespace std;
 
@@ -12,10 +12,6 @@ void func() {
 	int* p = new int[1000000];
 }
 
-void funcs() {
-	int i[1000];
-	funcs();
-}
 
 
 
