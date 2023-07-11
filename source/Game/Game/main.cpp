@@ -1,48 +1,51 @@
 #include <iostream>
-#include "Core/Random.h"
-#include "Core/FileIO.h"
-#include "Core/Memory.h"
+#include "Core/Core.h"
 #include <chrono>
-#include "Core/Time.h"
-//#include "Renderer/Renderer.h"
+#include "Renderer/Renderer.h"
 
 using namespace std;
 
-void func() {
-	int* p = new int[1000000];
-}
+class Star {
+public:
+	Star(const antares::Vector2& position, const antares::Vector2& velocity) : m_position{ position }, m_velocity{ velocity } {};
+	void Update() {
+		m_position += m_velocity;
+	}
+public:
+	antares::Vector2 m_position;
+	antares::Vector2 m_velocity;
+};
 
+int main(int argc, char* argv[]) {
+	antares::seedRandom(time(NULL));
 
+	vector<Star> points;
+	antares::Renderer renderer;
+	renderer.CreateWindow("window", 800, 600);
+	renderer.Initialize();
+	cout << renderer.GetWidth() << "x" << renderer.GetHeight();
 
+	for (int i = 0; i < 1000; i++) {
+		points.push_back(Star(antares::Vector2(antares::random(renderer.GetWidth()), antares::random(renderer.GetHeight())), antares::Vector2(1,1)));
+	}
 
+	while (true) {
+		renderer.SetColor(0, 0, 0, 0);
+		renderer.BeginFrame();
+		//renderer.SetColor(255, 255, 255, SDL_ALPHA_OPAQUE);
+		for (auto& point : points) {
+			int r = antares::random(256);
+			int g = antares::random(256);
+			int b = antares::random(256);
+			renderer.SetColor(r, g, b, SDL_ALPHA_OPAQUE);
+			point.Update();
+			if (point.m_position.x > renderer.GetWidth()) point.m_position.x = 0;
+			if (point.m_position.y > renderer.GetHeight()) point.m_position.y = 0;
 
-int main() {
-	antares::g_memoryTracker.displayInfo();
-	int* p = new int;
-	antares::g_memoryTracker.displayInfo();
-	delete p;
-	antares::g_memoryTracker.displayInfo();
+			renderer.DrawPoint(point.m_position.x, point.m_position.y);
+		}
+		renderer.EndFrame();
+	}
 
-	antares::Time timer;
-	for (int i = 0; i < 1000000; i++) {}
-	auto end = std::chrono::high_resolution_clock::now();
-	std::cout << timer.GetElapsedMilliseconds() << endl;
-
-	//for (int i = 0; i < 10; i++) {
-	//}
-
-	//cout << antares::getFilePath() << endl;
-	//antares::setFilePath("Assets");
-	//cout << antares::getFilePath() << endl;
-	//size_t size;
-	//antares::getFileSize("Game.txt", size);
-	//cout << size << endl << endl;
-	//std::string data;
-	//antares::readFile("Game.txt", data);
-	//cout << data << endl << endl;
-	//antares::seedRandom((unsigned int)time(nullptr));
-	//for (int i = 0; i < 10; i++) {
-	//	cout << antares::random(5, 10) << endl;
-	//}
-
+	return 0;
 }
