@@ -12,9 +12,11 @@ namespace antares
 
 	public:
 		Time() : 
-			m_startTime{ clock::now() }
+			m_startTime{ clock::now() },
+			m_frameTime{ clock::now() }
 		{}
 
+		void Tick();
 		void Reset() { m_startTime = clock::now(); }
 
 		clock_rep GetElapsedNanoseconds();
@@ -22,7 +24,15 @@ namespace antares
 		clock_rep GetElapsedMilliseconds();
 		float GetElapsedSeconds();
 
+		float GetTime() { return m_time; }
+		float getDeltaTime() { return m_deltaTime; }
+
 	private:
+		float m_time;
+		float m_deltaTime;
 		clock::time_point m_startTime;
+		clock::time_point m_frameTime;
 	};
+
+	extern Time g_time;
 }
