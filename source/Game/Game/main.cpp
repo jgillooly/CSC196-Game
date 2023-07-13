@@ -5,6 +5,8 @@
 #include "Renderer/Model.h"
 #include "../../Input/InputSystem.h"
 #include <thread>
+#include "Player.h"
+#include "Enemy.h"
 
 using namespace std;
 
@@ -25,12 +27,11 @@ int main(int argc, char* argv[]) {
 	antares::setFilePath("assets");
 	vector<Star> stars;
 	antares::Renderer renderer;
-	renderer.CreateWindow("window", 800, 600);
-	renderer.Initialize();
-	cout << renderer.GetWidth() << "x" << renderer.GetHeight();
+	antares::g_renderer.CreateWindow("window", 800, 600);
+	antares::g_renderer.Initialize();
+	cout << antares::g_renderer.GetWidth() << "x" << antares::g_renderer.GetHeight();
 
-	antares::InputSystem inputSystem;
-	inputSystem.Initialize();
+	antares::g_inputSystem.Initialize();
 
 	std::vector<antares::vec2> points{ {-10, 5}, { 10, 5 }, { 0, -5 }, { -10, 5 } };
 	antares::Model model;
@@ -39,67 +40,60 @@ int main(int argc, char* argv[]) {
 	antares::vec2 v{5, 5};
 	v.Normalize();
 
-
-
 	for (int i = 0; i < 1000; i++) {
-		stars.push_back(Star(antares::Vector2(antares::random(renderer.GetWidth()), antares::random(renderer.GetHeight())), 
+		stars.push_back(Star(antares::Vector2(antares::random(antares::g_renderer.GetWidth()), antares::random(antares::g_renderer.GetHeight())),
 			antares::Vector2(100,100)));
 	}
 	antares::Transform transform{{ 400, 300 }, 0, 1};
 	float speed = 100;
-	float turnRate = antares::Degrees2Radians(180.0f);
+	constexpr float turnRate = antares::Degrees2Radians(180.0f);
+	Player player{200, antares::Pi, {{400,300}, 0, 5}, model };
+	float rotat = antares::randomf(antares::TwoPi);
+	std::vector<Enemy> enemies;
+	for (int i = 0; i < 200; i++) {
+		enemies.push_back({ 200, 200, {{400,300}, rotat, 2}, model });
+	}
 
 	bool quit = false;
 
 	while (!quit) {
 		antares::g_time.Tick();
-		inputSystem.Update();
-		if (inputSystem.GetKeyDown(SDL_SCANCODE_ESCAPE)) {
+		antares::g_inputSystem.Update();
+		if (antares::g_inputSystem.GetKeyDown(SDL_SCANCODE_ESCAPE)) {
 			quit = true;
 		}
-		float rotate = 0;
-		if (inputSystem.GetKeyDown(SDL_SCANCODE_A)) rotate = -1;
-		if (inputSystem.GetKeyDown(SDL_SCANCODE_D)) rotate = 1;
-		transform.rotation += rotate * turnRate * antares::g_time.getDeltaTime();
 
-		float thrust = 0;
-		if (inputSystem.GetKeyDown(SDL_SCANCODE_W)) thrust = 1;
-		if (inputSystem.GetKeyDown(SDL_SCANCODE_S)) thrust = -1;
-		antares::vec2 forward = antares::vec2{ 0, -1 }.Rotate(transform.rotation);
-		transform.position += forward * speed * antares::g_time.getDeltaTime() * thrust;
 
-		antares::vec2 direction;
-		//if (inputSystem.GetKeyDown(SDL_SCANCODE_W)) direction.y = -1;
-		//if (inputSystem.GetKeyDown(SDL_SCANCODE_A)) direction.x = -1;
-		//if (inputSystem.GetKeyDown(SDL_SCANCODE_S)) direction.y = 1;
-		//if (inputSystem.GetKeyDown(SDL_SCANCODE_D)) direction.x = 1;
-
-		transform.position += ( direction.Rotate(transform.rotation) * speed * antares::g_time.getDeltaTime() );
-		//transform.position.x = antares::Wrap(transform.position.x, renderer.GetWidth());
-		//transform.position.y = antares::Wrap(transform.position.y, renderer.GetHeight());
-
-		if (inputSystem.GetMouseButtonDown(0)) {
+		if (antares::g_inputSystem.GetMouseButtonDown(0)) {
 			cout << "Mouse Pressed" << endl;
-			cout << "Mouse Position: (" << inputSystem.GetMousePosition().x << "," << inputSystem.GetMousePosition().y << ")" << endl;
+			cout << "Mouse Position: (" << antares::g_inputSystem.GetMousePosition().x << "," << antares::g_inputSystem.GetMousePosition().y << ")" << endl;
 		}
 
-		renderer.SetColor(0, 0, 0, 0);
-		renderer.BeginFrame();
+		antares::g_renderer.SetColor(0, 0, 0, 0);
+		antares::g_renderer.BeginFrame();
 		//renderer.SetColor(255, 255, 255, SDL_ALPHA_OPAQUE);
 		for (auto& point : stars) {
 			int r = antares::random(256);
 			int g = antares::random(256);
 			int b = antares::random(256);
-			renderer.SetColor(r, g, b, SDL_ALPHA_OPAQUE);
+			antares::g_renderer.SetColor(r, g, b, SDL_ALPHA_OPAQUE);
 			point.Update();
-			if (point.m_position.x > renderer.GetWidth()) point.m_position.x = 0;
-			if (point.m_position.y > renderer.GetHeight()) point.m_position.y = 0;
+			if (point.m_position.x > antares::g_renderer.GetWidth()) point.m_position.x = 0;
+			if (point.m_position.y > antares::g_renderer.GetHeight()) point.m_position.y = 0;
 
-			renderer.DrawPoint(point.m_position.x, point.m_position.y);
+			antares::g_renderer.DrawPoint(point.m_position.x, point.m_position.y);
 		}
-		model.Draw(renderer, transform.position, transform.rotation, transform.scale);
+		player.Update(antares::g_time.getDeltaTime());
+		player.Draw(antares::g_renderer);
+		for (auto enemy : enemies) {
+			enemy.Update(antares::g_time.getDeltaTime());
+			enemy.Draw(antares::g_renderer);
+		}
+		//enemy.Update(antares::g_time.getDeltaTime());
+		//enemy.Draw(antares::g_renderer);
+		//model.Draw(renderer, transform.position, transform.rotation, transform.scale);
 
-		renderer.EndFrame();
+		antares::g_renderer.EndFrame();
 
 		//this_thread::sleep_for(chrono::milliseconds(15));
 	}

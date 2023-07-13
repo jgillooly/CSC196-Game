@@ -13,6 +13,12 @@ namespace antares {
 		}
 	}
 
+	void Model::Draw(Renderer& renderer, const antares::Transform tf) {
+		Draw(renderer, tf.position, tf.rotation, tf.scale);
+	}
+
+	
+
 	bool Model::Load(const std::string& filename) {
 		std::string buffer;
 		antares::readFile(filename, buffer);

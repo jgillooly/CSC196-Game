@@ -36,4 +36,5 @@ namespace antares {
 		m_mouseButtonState[1] = buttons & SDL_BUTTON_MMASK; // buttons [0010] & [0RML]
 		m_mouseButtonState[2] = buttons & SDL_BUTTON_RMASK; // buttons [0100] & [0RML]
 	}
+	InputSystem g_inputSystem;
 }

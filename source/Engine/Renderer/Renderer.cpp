@@ -49,5 +49,6 @@ namespace antares {
 	void Renderer::DrawLine(int x1, int y1, int x2, int y2) {
 		SDL_RenderDrawLine(m_renderer, x1, y1, x2, y2);
 	}
+	Renderer g_renderer;
 }
 
