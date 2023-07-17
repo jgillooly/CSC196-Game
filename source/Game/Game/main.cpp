@@ -61,10 +61,14 @@ int main(int argc, char* argv[]) {
 
 	bool quit = false;
 
+	//game loop
 	while (!quit) {
+		//update systems
 		antares::g_audioSystem.Update();
 		antares::g_time.Tick();
 		antares::g_inputSystem.Update();
+
+		//get inputs
 		if (antares::g_inputSystem.GetKeyDown(SDL_SCANCODE_ESCAPE)) {
 			quit = true;
 		}
@@ -77,6 +81,7 @@ int main(int argc, char* argv[]) {
 			cout << "Mouse Position: (" << antares::g_inputSystem.GetMousePosition().x << "," << antares::g_inputSystem.GetMousePosition().y << ")" << endl;
 		}
 
+		//drawing
 		antares::g_renderer.SetColor(0, 0, 0, 0);
 		antares::g_renderer.BeginFrame();
 		//renderer.SetColor(255, 255, 255, SDL_ALPHA_OPAQUE);
