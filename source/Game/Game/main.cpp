@@ -7,6 +7,7 @@
 #include <thread>
 #include "Player.h"
 #include "Enemy.h"
+#include "Audio/AudioSystem.h"
 
 using namespace std;
 
@@ -33,6 +34,10 @@ int main(int argc, char* argv[]) {
 
 	antares::g_inputSystem.Initialize();
 
+	antares::g_audioSystem.Initialize();
+	antares::g_audioSystem.AddAudio("explosion", "Explosion.wav");
+	antares::g_audioSystem.AddAudio("laser", "LaserShoot.wav");
+
 	std::vector<antares::vec2> points{ {-10, 5}, { 10, 5 }, { 0, -5 }, { -10, 5 } };
 	antares::Model model;
 	model.Load("Diamond.txt");
@@ -57,12 +62,15 @@ int main(int argc, char* argv[]) {
 	bool quit = false;
 
 	while (!quit) {
+		antares::g_audioSystem.Update();
 		antares::g_time.Tick();
 		antares::g_inputSystem.Update();
 		if (antares::g_inputSystem.GetKeyDown(SDL_SCANCODE_ESCAPE)) {
 			quit = true;
 		}
-
+		if(antares::g_inputSystem.GetKeyDown(SDL_SCANCODE_SPACE)) {
+			antares::g_audioSystem.PlayOneShot("laser");
+		}
 
 		if (antares::g_inputSystem.GetMouseButtonDown(0)) {
 			cout << "Mouse Pressed" << endl;
