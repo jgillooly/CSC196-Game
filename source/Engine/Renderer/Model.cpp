@@ -5,6 +5,7 @@
 namespace antares {
 	void Model::Draw(Renderer& renderer, const vec2& pos, float rotation, float scale) {
 		if (m_points.size() < 2) return;
+		renderer.SetColor(Color::toInt(m_color.r), Color::toInt(m_color.g), Color::toInt(m_color.b), Color::toInt(m_color.a));
 		for (int i = 0; i < m_points.size()-1; i++) {
 			vec2 p1 = (m_points[i] * scale).Rotate(rotation) + pos;
 			vec2 p2 = (m_points[i + 1] * scale).Rotate(rotation) + pos;
@@ -24,12 +25,16 @@ namespace antares {
 		antares::readFile(filename, buffer);
 
 		std::istringstream stream(buffer);
+		//read color
+		stream >> m_color;
 
+		//read num points
 		std::string line;
 		std::getline(stream, line);
 
 		int numPoints = std::stoi(line);
 
+		//read points
 		for (int i = 0; i < numPoints; i++) {
 			Vector2 point;
 			stream >> point;

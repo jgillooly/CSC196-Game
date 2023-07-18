@@ -5,9 +5,12 @@
 #include "Renderer/Model.h"
 #include "../../Input/InputSystem.h"
 #include <thread>
+#include "Audio/AudioSystem.h"
+#include "Framework/Actor.h"
 #include "Player.h"
 #include "Enemy.h"
-#include "Audio/AudioSystem.h"
+#include "Framework/Scene.h"
+#include "Weapon.h"
 
 using namespace std;
 
@@ -23,6 +26,12 @@ public:
 };
 
 int main(int argc, char* argv[]) {
+
+	{
+		//std::unique_ptr<int> up = std::make_unique<int>(10);
+	}
+
+	antares::g_memoryTracker.displayInfo();
 
 	antares::seedRandom(time(NULL));
 	antares::setFilePath("assets");
@@ -49,14 +58,22 @@ int main(int argc, char* argv[]) {
 		stars.push_back(Star(antares::Vector2(antares::random(antares::g_renderer.GetWidth()), antares::random(antares::g_renderer.GetHeight())),
 			antares::Vector2(100,100)));
 	}
-	antares::Transform transform{{ 400, 300 }, 0, 1};
+	antares::Transform transform{{ 400, 300 }, 0, 5};
 	float speed = 100;
 	constexpr float turnRate = antares::Degrees2Radians(180.0f);
-	Player player{200, antares::Pi, {{400,300}, 0, 5}, model };
-	float rotat = antares::randomf(antares::TwoPi);
-	std::vector<Enemy> enemies;
-	for (int i = 0; i < 200; i++) {
-		enemies.push_back({ 200, 200, {{400,300}, rotat, 2}, model });
+
+	antares::Scene scene;
+
+	scene.Add(std::make_unique<Player>( 200, antares::Pi, transform, model ));
+	
+
+
+	
+	for (int i = 0; i < 5; i++) {
+		float rotat = antares::randomf(antares::TwoPi);
+		antares::Transform t1{ {400, 300}, rotat, 2};
+		unique_ptr<Enemy> enemy = std::make_unique<Enemy>(200, 200, t1, model);
+		scene.Add(std::move(enemy));
 	}
 
 	bool quit = false;
@@ -72,7 +89,7 @@ int main(int argc, char* argv[]) {
 		if (antares::g_inputSystem.GetKeyDown(SDL_SCANCODE_ESCAPE)) {
 			quit = true;
 		}
-		if(antares::g_inputSystem.GetKeyDown(SDL_SCANCODE_SPACE)) {
+		if(antares::g_inputSystem.GetKeyDown(SDL_SCANCODE_SPACE) && !antares::g_inputSystem.GetPreviousKeyDown(SDL_SCANCODE_SPACE)) {
 			antares::g_audioSystem.PlayOneShot("laser");
 		}
 
@@ -89,19 +106,15 @@ int main(int argc, char* argv[]) {
 			int r = antares::random(256);
 			int g = antares::random(256);
 			int b = antares::random(256);
-			antares::g_renderer.SetColor(r, g, b, SDL_ALPHA_OPAQUE);
+			antares::g_renderer.SetColor(255, 255, 255, SDL_ALPHA_OPAQUE);
 			point.Update();
 			if (point.m_position.x > antares::g_renderer.GetWidth()) point.m_position.x = 0;
 			if (point.m_position.y > antares::g_renderer.GetHeight()) point.m_position.y = 0;
 
 			antares::g_renderer.DrawPoint(point.m_position.x, point.m_position.y);
 		}
-		player.Update(antares::g_time.getDeltaTime());
-		player.Draw(antares::g_renderer);
-		for (auto enemy : enemies) {
-			enemy.Update(antares::g_time.getDeltaTime());
-			enemy.Draw(antares::g_renderer);
-		}
+		scene.Update(antares::g_time.getDeltaTime());
+		scene.Draw(antares::g_renderer);
 		//enemy.Update(antares::g_time.getDeltaTime());
 		//enemy.Draw(antares::g_renderer);
 		//model.Draw(renderer, transform.position, transform.rotation, transform.scale);
@@ -110,6 +123,8 @@ int main(int argc, char* argv[]) {
 
 		//this_thread::sleep_for(chrono::milliseconds(15));
 	}
+
+	antares::g_memoryTracker.displayInfo();
 
 	return 0;
 }

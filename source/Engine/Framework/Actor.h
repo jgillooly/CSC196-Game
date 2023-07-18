@@ -3,6 +3,7 @@
 #include "Renderer/Model.h"
 #include "Renderer/Renderer.h"
 
+namespace antares {
 class Actor {
 public:
 	Actor() = default;
@@ -10,7 +11,11 @@ public:
 
 	virtual void Update(float dt) = 0;
 	virtual void Draw(antares::Renderer& renderer);
+
+	class Scene* m_scene = nullptr;
+
 protected:
 	antares::Transform m_transform;
 	antares::Model m_model;
 };
+}

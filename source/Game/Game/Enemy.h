@@ -1,6 +1,6 @@
 #pragma once
-#include "Actor.h"
-class Enemy : public Actor {
+#include "Framework/Actor.h"
+class Enemy : public antares::Actor {
 public:
 	Enemy(float speed, float turnRate, const antares::Transform& transform, const antares::Model& model) :
 		Actor{ transform, model },

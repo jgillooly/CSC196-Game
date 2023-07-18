@@ -1,7 +1,15 @@
 #include "Player.h"
 #include "../../Input/InputSystem.h"
+#include "Weapon.h"
+#include "Framework/Scene.h"
 
 void Player::Update(float dt) {
+	if (antares::g_inputSystem.GetKeyDown(SDL_SCANCODE_SPACE) && !antares::g_inputSystem.GetPreviousKeyDown(SDL_SCANCODE_SPACE)) {
+		antares::Transform transform2 {m_transform.position, m_transform.rotation, 1};
+		std::unique_ptr<Weapon> weapon = std::make_unique<Weapon>( 400, 0, transform2, m_model );
+		m_scene->Add(std::move(weapon));
+	}
+
 	float rotate = 0;
 	if (antares::g_inputSystem.GetKeyDown(SDL_SCANCODE_A)) rotate = -1;
 	if (antares::g_inputSystem.GetKeyDown(SDL_SCANCODE_D)) rotate = 1;
