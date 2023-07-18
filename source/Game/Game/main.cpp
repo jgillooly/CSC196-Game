@@ -124,6 +124,9 @@ int main(int argc, char* argv[]) {
 		//this_thread::sleep_for(chrono::milliseconds(15));
 	}
 
+	
+	scene.RemoveAll();
+
 	antares::g_memoryTracker.displayInfo();
 
 	return 0;
