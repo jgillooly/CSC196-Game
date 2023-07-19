@@ -1,25 +1,20 @@
 #pragma once
-#include <iostream>
+#define _CRTDBG_MAP_ALLOC
+#include <stdlib.h>
+#include <crtdbg.h>
 #include <memory>
+
+#ifdef _DEBUG
+#define DEBUG_NEW   new( _CLIENT_BLOCK, __FILE__, __LINE__)
+#define new DEBUG_NEW
+#endif // _DEBUG
+
 namespace antares {
-	struct MemoryAllocation {
-		void* address;
-		size_t size;
-		MemoryAllocation* next;
-	};
-
-	class MemoryTracker {
+	class MemoryTracker
+	{
 	public:
-		void add(void* address, size_t size);
-		void remove(void* address, size_t size);
-
-		void displayInfo();
-
-	private:
-		size_t _bytesAllocated = 0;
-		size_t _numAllocations = 0;
+		static bool Initialize();
+		static void DisplayInfo();
 	};
-	
-	extern antares::MemoryTracker g_memoryTracker;
 }
 

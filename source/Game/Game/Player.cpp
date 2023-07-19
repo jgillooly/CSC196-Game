@@ -4,6 +4,8 @@
 #include "Framework/Scene.h"
 
 void Player::Update(float dt) {
+	Actor::Update(dt);
+
 	if (antares::g_inputSystem.GetKeyDown(SDL_SCANCODE_SPACE) && !antares::g_inputSystem.GetPreviousKeyDown(SDL_SCANCODE_SPACE)) {
 		antares::Transform transform2 {m_transform.position, m_transform.rotation, 1};
 		std::unique_ptr<Weapon> weapon = std::make_unique<Weapon>( 400, 0, transform2, m_model );

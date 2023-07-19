@@ -26,12 +26,10 @@ public:
 };
 
 int main(int argc, char* argv[]) {
-
+	antares::MemoryTracker::Initialize();
 	{
 		//std::unique_ptr<int> up = std::make_unique<int>(10);
 	}
-
-	antares::g_memoryTracker.displayInfo();
 
 	antares::seedRandom(time(NULL));
 	antares::setFilePath("assets");
@@ -64,7 +62,7 @@ int main(int argc, char* argv[]) {
 
 	antares::Scene scene;
 
-	scene.Add(std::make_unique<Player>( 200, antares::Pi, transform, model ));
+	scene.Add(std::make_unique<Player>( 400, antares::Pi, transform, model ));
 	
 
 
@@ -72,7 +70,7 @@ int main(int argc, char* argv[]) {
 	for (int i = 0; i < 5; i++) {
 		float rotat = antares::randomf(antares::TwoPi);
 		antares::Transform t1{ {400, 300}, rotat, 2};
-		unique_ptr<Enemy> enemy = std::make_unique<Enemy>(200, 200, t1, model);
+		unique_ptr<Enemy> enemy = std::make_unique<Enemy>(antares::random(150, 250), 200, t1, model);
 		scene.Add(std::move(enemy));
 	}
 
@@ -127,7 +125,6 @@ int main(int argc, char* argv[]) {
 	
 	scene.RemoveAll();
 
-	antares::g_memoryTracker.displayInfo();
-
+	antares::MemoryTracker::DisplayInfo();
 	return 0;
 }

@@ -9,13 +9,17 @@ public:
 	Actor() = default;
 	Actor(const antares::Transform& transform, const antares::Model& model) : m_transform{transform}, m_model {model} {}
 
-	virtual void Update(float dt) = 0;
+	virtual void Update(float dt);
 	virtual void Draw(antares::Renderer& renderer);
 
 	class Scene* m_scene = nullptr;
+	friend class Scene;
 
-protected:
 	antares::Transform m_transform;
+protected:
 	antares::Model m_model;
+
+	bool m_destroyed = false;
+	float m_lifespan = -1.0f;
 };
 }

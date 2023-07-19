@@ -4,7 +4,8 @@
 	public:
 		Weapon(float speed, float turnRate, const antares::Transform& transform, const antares::Model& model) :
 			Actor{ transform, model },
-			m_speed{ speed }, m_turnRate{ turnRate } {
+			m_speed{ speed }, m_turnRate{ turnRate }  {
+			m_lifespan = 2.0;
 		}
 		void Update(float dt) override;
 	private:
