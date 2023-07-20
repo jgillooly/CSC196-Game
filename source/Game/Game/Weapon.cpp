@@ -7,3 +7,9 @@ void Weapon::Update(float dt) {
 
 	m_destroyed = ((m_transform.position.x > antares::g_renderer.GetWidth() || m_transform.position.x < 0) || (m_transform.position.y > antares::g_renderer.GetHeight() || m_transform.position.y < 0));
 }
+
+void Weapon::OnCollision(Actor* other) {
+	if (other->m_tag != m_tag) {
+		m_destroyed = true;
+	}
+}

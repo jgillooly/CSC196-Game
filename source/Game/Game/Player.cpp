@@ -2,13 +2,15 @@
 #include "../../Input/InputSystem.h"
 #include "Weapon.h"
 #include "Framework/Scene.h"
+#include "Renderer/ModelManager.h"
 
 void Player::Update(float dt) {
 	Actor::Update(dt);
 
 	if (antares::g_inputSystem.GetKeyDown(SDL_SCANCODE_SPACE) && !antares::g_inputSystem.GetPreviousKeyDown(SDL_SCANCODE_SPACE)) {
 		antares::Transform transform2 {m_transform.position, m_transform.rotation, 1};
-		std::unique_ptr<Weapon> weapon = std::make_unique<Weapon>( 400, 0, transform2, m_model );
+		std::unique_ptr<Weapon> weapon = std::make_unique<Weapon>( 400, 0, transform2, antares::g_manager.Get("Diamond.txt"));
+		weapon->m_tag = "PlayerBullet";
 		m_scene->Add(std::move(weapon));
 	}
 
@@ -27,4 +29,11 @@ void Player::Update(float dt) {
 	//m_transform.position += (direction.Rotate(m_transform.rotation) * m_speed * antares::g_time.getDeltaTime());
 	m_transform.position.x = antares::Wrap(m_transform.position.x, (float)antares::g_renderer.GetWidth());
 	m_transform.position.y = antares::Wrap(m_transform.position.y, (float)antares::g_renderer.GetHeight());
+}
+
+void Player::OnCollision(Actor* other) {
+	if (other->m_tag == "EnemyBullet") {
+		m_health -= 25;
+		m_destroyed = ((m_health <= 0) ? true : false);
+	}
 }

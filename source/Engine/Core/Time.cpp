@@ -1,4 +1,5 @@
 #include "Time.h"
+#include "MathUtils.h"
 
 namespace antares
 {
@@ -9,6 +10,7 @@ namespace antares
 		m_time = duration.count() / static_cast<float>(clock_duration::period::den);
 		duration = clock::now() - m_frameTime;
 		m_deltaTime = duration.count() / static_cast<float>(clock_duration::period::den);
+		m_deltaTime = Min(m_deltaTime, 0.25f);
 
 		m_frameTime = clock::now();
 	}

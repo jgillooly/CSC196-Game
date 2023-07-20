@@ -2,7 +2,6 @@
 #include "Core/Core.h"
 #include <chrono>
 #include "Renderer/Renderer.h"
-#include "Renderer/Model.h"
 #include "../../Input/InputSystem.h"
 #include <thread>
 #include "Audio/AudioSystem.h"
@@ -11,6 +10,7 @@
 #include "Enemy.h"
 #include "Framework/Scene.h"
 #include "Weapon.h"
+#include "Renderer/ModelManager.h"
 
 using namespace std;
 
@@ -46,8 +46,6 @@ int main(int argc, char* argv[]) {
 	antares::g_audioSystem.AddAudio("laser", "LaserShoot.wav");
 
 	std::vector<antares::vec2> points{ {-10, 5}, { 10, 5 }, { 0, -5 }, { -10, 5 } };
-	antares::Model model;
-	model.Load("Diamond.txt");
 
 	antares::vec2 v{5, 5};
 	v.Normalize();
@@ -62,7 +60,11 @@ int main(int argc, char* argv[]) {
 
 	antares::Scene scene;
 
-	scene.Add(std::make_unique<Player>( 400, antares::Pi, transform, model ));
+	std::unique_ptr<Player> player = std::make_unique<Player>(400, antares::Pi, transform, antares::g_manager.Get("Diamond.txt"));
+
+	player->m_tag = "Player";
+
+	scene.Add(std::move(player));
 	
 
 
@@ -70,7 +72,8 @@ int main(int argc, char* argv[]) {
 	for (int i = 0; i < 5; i++) {
 		float rotat = antares::randomf(antares::TwoPi);
 		antares::Transform t1{ {400, 300}, rotat, 2};
-		unique_ptr<Enemy> enemy = std::make_unique<Enemy>(antares::random(150, 250), 200, t1, model);
+		unique_ptr<Enemy> enemy = std::make_unique<Enemy>(antares::random(150, 250), 200, t1, antares::g_manager.Get("Diamond.txt"));
+		enemy->m_tag = "Enemy";
 		scene.Add(std::move(enemy));
 	}
 

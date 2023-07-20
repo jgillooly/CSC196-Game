@@ -4,6 +4,7 @@
 #include "Player.h"
 #include "Weapon.h"
 #include <memory>
+#include "Renderer/ModelManager.h"
 
 void Enemy::Update(float dt) {
 	Actor::Update(dt);
@@ -25,8 +26,15 @@ void Enemy::Update(float dt) {
 	m_firetimer -= dt;
 	if (m_firetimer <= 0) {
 		antares::Transform transform2 {m_transform.position, m_transform.rotation, 1};
-		std::unique_ptr<Weapon> weapon = std::make_unique<Weapon>(400, 0, transform2, m_model);
+		std::unique_ptr<Weapon> weapon = std::make_unique<Weapon>(400, 0, transform2, antares::g_manager.Get("Diamond.txt"));
+		weapon->m_tag = "EnemyBullet";
 		m_scene->Add(std::move(weapon));
 		m_firetimer = m_firetime;
+	}
+}
+
+void Enemy::OnCollision(Actor* other) {
+	if (other->m_tag == "PlayerBullet") {
+		m_destroyed = true;
 	}
 }

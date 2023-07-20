@@ -12,8 +12,11 @@ namespace antares {
 		void Draw(Renderer& renderer, const antares::Transform tf);
 		bool Load(const std::string& filename);
 
+		float GetRadius();
+
 	private:
 		std::vector<vec2> m_points;
 		Color m_color;
+		float m_radius = 0;
 	};
 }
