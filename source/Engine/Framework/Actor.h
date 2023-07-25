@@ -18,6 +18,7 @@ public:
 	virtual void OnCollision(Actor* other) {}
 
 	class Scene* m_scene = nullptr;
+	class Game* m_game = nullptr;
 	friend class Scene;
 
 	antares::Transform m_transform;

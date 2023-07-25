@@ -5,6 +5,7 @@
 #include "Weapon.h"
 #include <memory>
 #include "Renderer/ModelManager.h"
+#include "SpaceGame.h"
 
 void Enemy::Update(float dt) {
 	Actor::Update(dt);
@@ -36,5 +37,6 @@ void Enemy::Update(float dt) {
 void Enemy::OnCollision(Actor* other) {
 	if (other->m_tag == "PlayerBullet") {
 		m_destroyed = true;
+		m_game->AddPoints(50);
 	}
 }

@@ -3,6 +3,8 @@
 #include "Weapon.h"
 #include "Framework/Scene.h"
 #include "Renderer/ModelManager.h"
+#include "SpaceGame.h"
+#include "Framework/Game.h"
 
 void Player::Update(float dt) {
 	Actor::Update(dt);
@@ -33,7 +35,8 @@ void Player::Update(float dt) {
 
 void Player::OnCollision(Actor* other) {
 	if (other->m_tag == "EnemyBullet") {
-		m_health -= 25;
+		m_game->SetLives(m_game->GetLives() - 1);
+		//dynamic_cast<SpaceGame>(m_game)->SetState();
 		m_destroyed = ((m_health <= 0) ? true : false);
 	}
 }

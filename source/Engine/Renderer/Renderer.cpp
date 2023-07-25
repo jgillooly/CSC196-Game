@@ -1,4 +1,5 @@
 #include "Renderer.h"
+#include "SDL2-2.28.1/include/SDL_ttf.h"
 
 namespace antares {
 	SDL_Renderer* renderer{ nullptr };
@@ -12,13 +13,15 @@ namespace antares {
 
 	bool Renderer::Initialize() {
 		SDL_Init(SDL_INIT_VIDEO);
-
+		TTF_Init();
 
 		return true;
 	}
 
 	void Renderer::Shutdown() {
-
+		SDL_DestroyRenderer(m_renderer);
+		SDL_DestroyWindow(m_window);
+		TTF_Quit();
 	}
 
 	void Renderer::CreateWindow(const std::string& title, int width, int height) {

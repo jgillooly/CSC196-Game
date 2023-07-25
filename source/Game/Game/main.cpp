@@ -11,6 +11,9 @@
 #include "Framework/Scene.h"
 #include "Weapon.h"
 #include "Renderer/ModelManager.h"
+#include "Renderer/Font.h"
+#include "Renderer/Text.h"
+#include "SpaceGame.h"
 
 using namespace std;
 
@@ -42,8 +45,12 @@ int main(int argc, char* argv[]) {
 	antares::g_inputSystem.Initialize();
 
 	antares::g_audioSystem.Initialize();
-	antares::g_audioSystem.AddAudio("explosion", "Explosion.wav");
-	antares::g_audioSystem.AddAudio("laser", "LaserShoot.wav");
+
+	unique_ptr<SpaceGame> game = make_unique<SpaceGame>();
+	game->Initialize();
+
+
+
 
 	std::vector<antares::vec2> points{ {-10, 5}, { 10, 5 }, { 0, -5 }, { -10, 5 } };
 
@@ -54,17 +61,9 @@ int main(int argc, char* argv[]) {
 		stars.push_back(Star(antares::Vector2(antares::random(antares::g_renderer.GetWidth()), antares::random(antares::g_renderer.GetHeight())),
 			antares::Vector2(100,100)));
 	}
-	antares::Transform transform{{ 400, 300 }, 0, 5};
-	float speed = 100;
-	constexpr float turnRate = antares::Degrees2Radians(180.0f);
 
-	antares::Scene scene;
 
-	std::unique_ptr<Player> player = std::make_unique<Player>(400, antares::Pi, transform, antares::g_manager.Get("Diamond.txt"));
-
-	player->m_tag = "Player";
-
-	scene.Add(std::move(player));
+	
 	
 
 
@@ -74,7 +73,7 @@ int main(int argc, char* argv[]) {
 		antares::Transform t1{ {400, 300}, rotat, 2};
 		unique_ptr<Enemy> enemy = std::make_unique<Enemy>(antares::random(150, 250), 200, t1, antares::g_manager.Get("Diamond.txt"));
 		enemy->m_tag = "Enemy";
-		scene.Add(std::move(enemy));
+		//scene.Add(std::move(enemy));
 	}
 
 	bool quit = false;
@@ -85,7 +84,7 @@ int main(int argc, char* argv[]) {
 		antares::g_audioSystem.Update();
 		antares::g_time.Tick();
 		antares::g_inputSystem.Update();
-
+		game->Uptdate(antares::g_time.getDeltaTime());
 		//get inputs
 		if (antares::g_inputSystem.GetKeyDown(SDL_SCANCODE_ESCAPE)) {
 			quit = true;
@@ -102,6 +101,7 @@ int main(int argc, char* argv[]) {
 		//drawing
 		antares::g_renderer.SetColor(0, 0, 0, 0);
 		antares::g_renderer.BeginFrame();
+		//text->Draw(antares::g_renderer, 400, 300);
 		//renderer.SetColor(255, 255, 255, SDL_ALPHA_OPAQUE);
 		for (auto& point : stars) {
 			int r = antares::random(256);
@@ -114,11 +114,12 @@ int main(int argc, char* argv[]) {
 
 			antares::g_renderer.DrawPoint(point.m_position.x, point.m_position.y);
 		}
-		scene.Update(antares::g_time.getDeltaTime());
-		scene.Draw(antares::g_renderer);
+		//scene.Update(antares::g_time.getDeltaTime());
+		//scene.Draw(antares::g_renderer);
 		//enemy.Update(antares::g_time.getDeltaTime());
 		//enemy.Draw(antares::g_renderer);
 		//model.Draw(renderer, transform.position, transform.rotation, transform.scale);
+		game->Draw(antares::g_renderer);
 
 		antares::g_renderer.EndFrame();
 
@@ -126,7 +127,7 @@ int main(int argc, char* argv[]) {
 	}
 
 	
-	scene.RemoveAll();
+	//scene.RemoveAll();
 
 	antares::MemoryTracker::DisplayInfo();
 	return 0;
