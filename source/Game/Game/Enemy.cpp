@@ -6,6 +6,8 @@
 #include <memory>
 #include "Renderer/ModelManager.h"
 #include "SpaceGame.h"
+#include "Framework/Emitter.h"
+#include "Renderer/ParticleSystem.h"
 
 void Enemy::Update(float dt) {
 	Actor::Update(dt);
@@ -38,5 +40,21 @@ void Enemy::OnCollision(Actor* other) {
 	if (other->m_tag == "PlayerBullet") {
 		m_destroyed = true;
 		m_game->AddPoints(50);
+		antares::EmitterData data;
+		data.burst = true;
+		data.burstCount = 100;
+		data.spawnRate = 200;
+		data.angle = 0;
+		data.angleRange = antares::Pi;
+		data.lifetimeMin = 0.5f;
+		data.lifetimeMax = 1.5f;
+		data.speedMin = 50;
+		data.speedMax = 250;
+		data.damping = 0.5f;
+		data.color = antares::Color{ 1, 0, 0, 1 };
+		antares::Transform transform{ m_transform.position, 0, 1 };
+		auto emitter = std::make_unique<antares::Emitter>(transform, data);
+		emitter->m_lifespan = 1.0f;
+		m_scene->Add(std::move(emitter));
 	}
 }

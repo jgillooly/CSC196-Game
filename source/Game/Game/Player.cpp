@@ -4,7 +4,8 @@
 #include "Framework/Scene.h"
 #include "Renderer/ModelManager.h"
 #include "SpaceGame.h"
-#include "Framework/Game.h"
+#include "Framework/Emitter.h"
+#include "Renderer/ParticleSystem.h"
 
 void Player::Update(float dt) {
 	Actor::Update(dt);
@@ -34,9 +35,28 @@ void Player::Update(float dt) {
 }
 
 void Player::OnCollision(Actor* other) {
-	if (other->m_tag == "EnemyBullet") {
+	if (other->m_tag == "EnemyBullet" && !other->isDestroyed()) {
+		std::cout << "Boom";
 		m_game->SetLives(m_game->GetLives() - 1);
-		//dynamic_cast<SpaceGame>(m_game)->SetState();
-		m_destroyed = ((m_health <= 0) ? true : false);
+		dynamic_cast<SpaceGame*>(m_game)->SetState(SpaceGame::PlayerDead);
+		m_destroyed = true;
+		if (m_destroyed) {
+			antares::EmitterData data;
+			data.burst = true;
+			data.burstCount = 100;
+			data.spawnRate = 200;
+			data.angle = 0;
+			data.angleRange = antares::Pi;
+			data.lifetimeMin = 0.5f;
+			data.lifetimeMax = 1.5f;
+			data.speedMin = 50;
+			data.speedMax = 250;
+			data.damping = 0.5f;
+			data.color = antares::Color{ 1, 0, 0, 1 };
+			antares::Transform transform{ m_transform.position, 0, 1 };
+			auto emitter = std::make_unique<antares::Emitter>(transform, data);
+			emitter->m_lifespan = 1.0f;
+			m_scene->Add(std::move(emitter));
+		}
 	}
 }

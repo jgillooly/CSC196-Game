@@ -9,6 +9,8 @@
 #include "Core/Transform.h"
 #include "Renderer/ModelManager.h"
 #include "Framework/Scene.h"
+#include "Framework/Emitter.h"
+#include "Renderer/ParticleSystem.h"
 
 bool SpaceGame::Initialize() {	
 	// create font / text objects
@@ -19,12 +21,18 @@ bool SpaceGame::Initialize() {
 	m_titleText = std::make_unique<antares::Text>(m_font);
 	m_titleText->Create(antares::g_renderer, "Asteroids", antares::Color{ 1, 1, 1, 1 });
 
+	m_livesText = std::make_unique<antares::Text>(m_font);
+	m_livesText->Create(antares::g_renderer, "Lives:", antares::Color{ 1, 1, 1, 1 });
+
+	m_gameOverText = std::make_unique<antares::Text>(m_font);
+	m_gameOverText->Create(antares::g_renderer, "GAME OVER", antares::Color{ 1, 1, 1, 1 });
+
 	antares::g_audioSystem.AddAudio("explosion", "Explosion.wav");
 	antares::g_audioSystem.AddAudio("laser", "LaserShoot.wav");
 
 	m_scene = std::make_unique<antares::Scene>();
 	m_state = SpaceGame::Title;
-	
+	antares::g_particleSystem = antares::ParticleSystem(10000);
 
 	return true;
 }
@@ -35,10 +43,32 @@ void SpaceGame::Shutdown() {
 void SpaceGame::Uptdate(float dt) {
 	switch (m_state) {
 	case SpaceGame::Title:
+	{
 		if (antares::g_inputSystem.GetKeyDown(SDL_SCANCODE_SPACE)) {
 			m_state = eState::StartGame;
 		}
+
+		if (antares::g_inputSystem.GetMouseButtonDown(0)) {
+			antares::EmitterData data;
+			data.burst = true;
+			data.burstCount = 100;
+			data.spawnRate = 200;
+			data.angle = 0;
+			data.angleRange = antares::Pi;
+			data.lifetimeMin = 0.5f;
+			data.lifetimeMax = 1.5f;
+			data.speedMin = 50;
+			data.speedMax = 250;
+			data.damping = 0.5f;
+			data.color = antares::Color{ 1, 0, 0, 1 };
+			antares::Transform transform{ { antares::g_inputSystem.GetMousePosition() }, 0, 1 };
+			auto emitter = std::make_unique<antares::Emitter>(transform, data);
+			emitter->m_lifespan = 1.0f;
+			m_scene->Add(std::move(emitter));
+		}
+
 		break;
+	}
 	case SpaceGame::StartGame:
 		m_score = 0;
 		m_lives = 3;
@@ -68,22 +98,41 @@ void SpaceGame::Uptdate(float dt) {
 		}
 		break;
 	case SpaceGame::PlayerDead:
-		if (m_lives == 0) m_state = eState::GameOver;
-		else m_state = eState::StartLevel;
+		if (m_deathTimer >= 3) {
+			if (m_lives == 0) {
+				m_state = eState::GameOver;
+			}
+			else {
+				m_scene->RemoveAll();
+				m_state = eState::StartLevel;
+			}
+			m_deathTimer = 0;
+		}
+		else {
+			m_deathTimer += dt;
+		}
 		break;
 	case SpaceGame::GameOver:
+
 		break;
 	default:
 		break;
 	}
 
 	m_scoreText->Create(antares::g_renderer, "Score:" + std::to_string(m_score), antares::Color{ 1, 1, 1, 1 });
+	m_livesText->Create(antares::g_renderer, "Lives:" + std::to_string(m_lives), antares::Color{ 1, 1, 1, 1 });
 	m_scene->Update(dt);
+	antares::g_particleSystem.Update(dt);
 }
 
 void SpaceGame::Draw(antares::Renderer& renderer) {
 	if (m_state == eState::Title) m_titleText->Draw(renderer, 400, 300);
+	if (m_state == eState::GameOver) m_gameOverText->Draw(renderer, 400, 300);
 
-	m_scoreText->Draw(renderer, 40, 40);
+	if (m_state != eState::Title) {
+		m_scoreText->Draw(renderer, 40, 40);
+		m_livesText->Draw(renderer, 300, 40);
+	}
 	m_scene->Draw(renderer);
+	antares::g_particleSystem.Draw(renderer);
 }
