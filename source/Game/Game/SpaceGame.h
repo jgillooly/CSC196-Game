@@ -34,6 +34,8 @@ private:
 	std::shared_ptr<antares::Text> m_titleText;
 	std::shared_ptr<antares::Text> m_livesText;
 	std::shared_ptr<antares::Text> m_gameOverText;
+	std::shared_ptr<antares::Text> m_boostText;
 	antares::ParticleSystem m_PS;
+	int m_milestone = 0;
 
 };

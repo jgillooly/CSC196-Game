@@ -29,15 +29,23 @@ void Enemy::Update(float dt) {
 	m_firetimer -= dt;
 	if (m_firetimer <= 0) {
 		antares::Transform transform2 {m_transform.position, m_transform.rotation, 1};
-		std::unique_ptr<Weapon> weapon = std::make_unique<Weapon>(400, 0, transform2, antares::g_manager.Get("Diamond.txt"));
+		std::unique_ptr<Weapon> weapon = std::make_unique<Weapon>(400, 0, transform2, antares::g_manager.Get("DiamondB.txt"));
 		weapon->m_tag = "EnemyBullet";
 		m_scene->Add(std::move(weapon));
+		if (m_special) {
+			for (int i = 1; i <= 3; i++) {
+				transform2 = { m_transform.position, m_transform.rotation + (antares::HalfPi * i), 1 };
+				std::unique_ptr<Weapon> weapon = std::make_unique<Weapon>(400, 0, transform2, antares::g_manager.Get("DiamondB.txt"));
+				weapon->m_tag = "EnemyBullet";
+				m_scene->Add(std::move(weapon));
+			}
+		}
 		m_firetimer = m_firetime;
 	}
 }
 
 void Enemy::OnCollision(Actor* other) {
-	if (other->m_tag == "PlayerBullet") {
+	if (other->m_tag == "PlayerBullet" && !m_destroyed) {
 		m_destroyed = true;
 		m_game->AddPoints(50);
 		antares::EmitterData data;
@@ -55,6 +63,7 @@ void Enemy::OnCollision(Actor* other) {
 		antares::Transform transform{ m_transform.position, 0, 1 };
 		auto emitter = std::make_unique<antares::Emitter>(transform, data);
 		emitter->m_lifespan = 1.0f;
+		emitter->m_tag = "Emitter";
 		m_scene->Add(std::move(emitter));
 	}
 }

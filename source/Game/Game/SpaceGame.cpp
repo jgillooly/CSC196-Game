@@ -11,6 +11,7 @@
 #include "Framework/Scene.h"
 #include "Framework/Emitter.h"
 #include "Renderer/ParticleSystem.h"
+#include "Pickup.h"
 
 bool SpaceGame::Initialize() {	
 	// create font / text objects
@@ -26,6 +27,9 @@ bool SpaceGame::Initialize() {
 
 	m_gameOverText = std::make_unique<antares::Text>(m_font);
 	m_gameOverText->Create(antares::g_renderer, "GAME OVER", antares::Color{ 1, 1, 1, 1 });
+
+	m_boostText = std::make_unique<antares::Text>(m_font);
+	m_boostText->Create(antares::g_renderer, "Boost: Ready", antares::Color{ 1, 1, 1, 1 });
 
 	antares::g_audioSystem.AddAudio("explosion", "Explosion.wav");
 	antares::g_audioSystem.AddAudio("laser", "LaserShoot.wav");
@@ -76,6 +80,7 @@ void SpaceGame::Uptdate(float dt) {
 		break;
 	case SpaceGame::StartLevel:
 		{ antares::Transform transform{ { 400, 300 }, 0, 5 };
+		m_milestone = m_score;
 		float speed = 100;
 		constexpr float turnRate = antares::Degrees2Radians(180.0f);
 		std::unique_ptr<Player> player = std::make_unique<Player>(400, antares::Pi, transform, antares::g_manager.Get("Diamond.txt"));
@@ -89,12 +94,26 @@ void SpaceGame::Uptdate(float dt) {
 		m_spawnTimer += dt;
 		if (m_spawnTimer >= m_spawnTime) {
 			m_spawnTimer = 0;
+			int specialRoll = antares::random(1, 100);
+			bool isSpecial = specialRoll <= 50;
+			if (isSpecial) std::cout << "Special Spawned" << std::endl;
 			float rotat = antares::randomf(antares::TwoPi);
 			antares::Transform t1{ {400, 300}, rotat, 2};
-			std::unique_ptr<Enemy> enemy = std::make_unique<Enemy>(antares::random(150, 250), 200, t1, antares::g_manager.Get("Diamond.txt"));
+			std::unique_ptr<Enemy> enemy = std::make_unique<Enemy>(antares::random(150, 250), 200, t1, antares::g_manager.Get("DiamondR.txt"), isSpecial);
 			enemy->m_tag = "Enemy";
 			enemy->m_game = this;
 			m_scene->Add(std::move(enemy));
+		}
+		if (m_score >= m_milestone + 200) {
+ 			int x = antares::random(100, antares::g_renderer.GetWidth() - 100);
+			int y = antares::random(100, antares::g_renderer.GetHeight() - 100);
+			antares::Transform t2{ {x,y}, 0, 10};
+   			std::unique_ptr<Pickup> pickup = std::make_unique<Pickup>(t2, antares::g_manager.Get("DiamondH.txt"), 10);
+			pickup->m_tag = "Pickup";
+			pickup->m_game = this;
+			m_scene->Add(std::move(pickup));
+			m_milestone = m_score;
+			std::cout << "Pickup Spawned at: " << x << "," << y << std::endl;
 		}
 		break;
 	case SpaceGame::PlayerDead:
@@ -121,17 +140,24 @@ void SpaceGame::Uptdate(float dt) {
 
 	m_scoreText->Create(antares::g_renderer, "Score:" + std::to_string(m_score), antares::Color{ 1, 1, 1, 1 });
 	m_livesText->Create(antares::g_renderer, "Lives:" + std::to_string(m_lives), antares::Color{ 1, 1, 1, 1 });
+	Player* p = m_scene->GetActor<Player>();
+	std::string status = "";
+	if (p) {
+		status = p->getBoostStatus();
+	}
+	m_boostText->Create(antares::g_renderer, "Boost Status: " + status, antares::Color{ 1, 1, 1, 1 });
 	m_scene->Update(dt);
 	antares::g_particleSystem.Update(dt);
 }
 
 void SpaceGame::Draw(antares::Renderer& renderer) {
-	if (m_state == eState::Title) m_titleText->Draw(renderer, 400, 300);
+	if (m_state == eState::Title) m_titleText->Draw(renderer, (renderer.GetWidth()/2) - 65, renderer.GetHeight()/2);
 	if (m_state == eState::GameOver) m_gameOverText->Draw(renderer, 400, 300);
 
 	if (m_state != eState::Title) {
 		m_scoreText->Draw(renderer, 40, 40);
 		m_livesText->Draw(renderer, 300, 40);
+		m_boostText->Draw(renderer, 40, 500);
 	}
 	m_scene->Draw(renderer);
 	antares::g_particleSystem.Draw(renderer);

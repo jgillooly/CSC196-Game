@@ -46,6 +46,7 @@ int main(int argc, char* argv[]) {
 
 	antares::g_audioSystem.Initialize();
 
+
 	unique_ptr<SpaceGame> game = make_unique<SpaceGame>();
 	game->Initialize();
 
