@@ -35,7 +35,9 @@ private:
 	std::shared_ptr<antares::Text> m_livesText;
 	std::shared_ptr<antares::Text> m_gameOverText;
 	std::shared_ptr<antares::Text> m_boostText;
+	std::shared_ptr<antares::Text> m_HSText;
 	antares::ParticleSystem m_PS;
 	int m_milestone = 0;
+	int highscore = 0;
 
 };

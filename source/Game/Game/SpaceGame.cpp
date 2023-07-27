@@ -31,12 +31,22 @@ bool SpaceGame::Initialize() {
 	m_boostText = std::make_unique<antares::Text>(m_font);
 	m_boostText->Create(antares::g_renderer, "Boost: Ready", antares::Color{ 1, 1, 1, 1 });
 
+	m_HSText = std::make_unique<antares::Text>(m_font);
+	
+
 	antares::g_audioSystem.AddAudio("explosion", "Explosion.wav");
 	antares::g_audioSystem.AddAudio("laser", "LaserShoot.wav");
+	antares::g_audioSystem.AddAudio("music", "Music.wav");
 
 	m_scene = std::make_unique<antares::Scene>();
 	m_state = SpaceGame::Title;
 	antares::g_particleSystem = antares::ParticleSystem(10000);
+
+	std::string HSString = "";
+	antares::readFile("Highscore.txt", HSString);
+	m_HSText->Create(antares::g_renderer, "High Score: " + HSString, antares::Color{ 1, 1, 1, 1 });
+	highscore = std::stoi(HSString);
+	antares::g_audioSystem.PlayLoop("music");
 
 	return true;
 }
@@ -51,7 +61,7 @@ void SpaceGame::Uptdate(float dt) {
 		if (antares::g_inputSystem.GetKeyDown(SDL_SCANCODE_SPACE)) {
 			m_state = eState::StartGame;
 		}
-
+		
 		if (antares::g_inputSystem.GetMouseButtonDown(0)) {
 			antares::EmitterData data;
 			data.burst = true;
@@ -132,7 +142,12 @@ void SpaceGame::Uptdate(float dt) {
 		}
 		break;
 	case SpaceGame::GameOver:
-
+		if (m_score > highscore) {
+			highscore = m_score;
+			m_HSText->Create(antares::g_renderer, "New High Score!", antares::Color{ 1, 1, 1, 1 });
+			std::string HSString = std::to_string(highscore);
+			antares::writeFile("Highscore.txt", HSString);
+		}
 		break;
 	default:
 		break;
@@ -153,7 +168,7 @@ void SpaceGame::Uptdate(float dt) {
 void SpaceGame::Draw(antares::Renderer& renderer) {
 	if (m_state == eState::Title) m_titleText->Draw(renderer, (renderer.GetWidth()/2) - 65, renderer.GetHeight()/2);
 	if (m_state == eState::GameOver) m_gameOverText->Draw(renderer, 400, 300);
-
+	m_HSText->Draw(renderer, 400, 550);
 	if (m_state != eState::Title) {
 		m_scoreText->Draw(renderer, 40, 40);
 		m_livesText->Draw(renderer, 300, 40);

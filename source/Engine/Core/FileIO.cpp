@@ -34,4 +34,17 @@ namespace antares {
 
 		return true;
 	}
+
+	bool writeFile(const std::string path, std::string buffer) {
+		//if (!fileExists(path)) return false;
+		std::ofstream output(path, std::ofstream::out | std::ofstream::trunc); //Bitwise OR
+		if (output.is_open() == true) {
+				output << buffer;
+
+		}
+		if (output.is_open() == true) output.close();
+		return true;
+	}
+
+	
 }

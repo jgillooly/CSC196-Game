@@ -33,9 +33,11 @@ int main(int argc, char* argv[]) {
 	{
 		//std::unique_ptr<int> up = std::make_unique<int>(10);
 	}
+	std::string stri = "test";
 
 	antares::seedRandom(time(NULL));
 	antares::setFilePath("assets");
+	antares::writeFile("Test.txt", stri);
 	vector<Star> stars;
 	antares::Renderer renderer;
 	antares::g_renderer.CreateWindow("window", 800, 600);

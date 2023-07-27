@@ -31,5 +31,14 @@ namespace antares {
 			m_fmodSystem->playSound(sound, 0, false, &channel);
 		}
 	}
+	void AudioSystem::PlayLoop(const std::string& name) {
+		auto iter = m_sounds.find(name);
+		if (iter != m_sounds.end()) {
+			FMOD::Sound* sound = iter->second;
+			sound->setMode(FMOD_LOOP_NORMAL);
+			FMOD::Channel* channel;
+			m_fmodSystem->playSound(sound, 0, false, &channel);
+		}
+	}
 	AudioSystem g_audioSystem;
 }
